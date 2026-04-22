@@ -2,15 +2,32 @@
 
 import { redirect } from "next/navigation";
 
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { sendMagicLinkEmail } from "@/lib/email";
 
 export async function signInAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
 
-  const { error } = await supabase.auth.signInWithOtp({ email });
+  const { data, error } = await supabase.auth.admin.generateLink({
+    email,
+    type: "magiclink",
+  });
+
   if (error) {
     redirect(`/login?error=${encodeURIComponent(error.message)}`);
+  }
+
+  const link = data.properties?.action_link;
+  if (!link) {
+    redirect(`/login?error=${encodeURIComponent("Failed to generate magic link")}`);
+  }
+
+  try {
+    await sendMagicLinkEmail(email, link);
+  } catch {
+    redirect(`/login?error=${encodeURIComponent("Failed to send magic link email")}`);
   }
 
   redirect("/login?magicLinkSent=true");
