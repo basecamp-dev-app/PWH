@@ -9,9 +9,9 @@ export function IntradayPage() {
     <section className="page-stack">
       <div className="page-heading">
         <p className="eyebrow">Intraday</p>
-        <h1>Significant orders workflow</h1>
+        <h1>Significant orders and tracked flow</h1>
         <p className="muted">
-          V1 keeps the significant-orders and tracked-orders workflow while removing Excel reads from the UI.
+          Focus the desk on the highest-value orders, use Vals context faster, and keep tracked flow readable throughout the session.
         </p>
       </div>
       <div className="split-grid">
@@ -21,7 +21,7 @@ export function IntradayPage() {
       <div className="panel page-stack">
         <div>
           <p className="eyebrow">Tracked Orders</p>
-          <h2>Imported from legacy flat file</h2>
+          <h2>Imported legacy watchlist</h2>
         </div>
         <ul className="plain-list">
           {trackedOrders.map((entry) => (

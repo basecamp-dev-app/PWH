@@ -4,10 +4,10 @@ export function SignInCard() {
   return (
     <div className="login-page">
       <section className="panel login-card">
-        <p className="eyebrow">JDB V1</p>
-        <h1>Sign in</h1>
+        <p className="eyebrow">PWH V1</p>
+        <h1>Platform sign in</h1>
         <p className="muted">
-          V1 keeps auth lightweight while the legacy Python app remains the reference implementation.
+          Internal workspace for traded flow, intraday review, and reporting. Supabase authentication is the next infrastructure pass.
         </p>
         <form className="login-form">
           <label>
@@ -16,14 +16,14 @@ export function SignInCard() {
           </label>
           <label>
             Password
-            <input type="password" placeholder="Supabase Auth wiring next" disabled />
+            <input type="password" placeholder="Auth rollout in progress" disabled />
           </label>
           <button type="button" disabled>
-            Supabase Auth Coming Next
+            Authentication Coming Next
           </button>
         </form>
         <Link href="/" className="text-link">
-          Enter V1 preview
+          Enter platform preview
         </Link>
       </section>
     </div>

@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JDB V1",
-  description: "Workflow-first V1 modernization of the legacy trading desktop app.",
+  title: "PWH V1",
+  description: "Workflow-first PWH platform for trading, intraday review, and desk reporting.",
 };
 
 export default function RootLayout({

@@ -16,6 +16,16 @@ export function ReportPage({
         <h1>{config.title}</h1>
         <p className="muted">{config.description}</p>
       </div>
+      <div className="stats-row">
+        <div className="panel stat-card stat-card--left">
+          <span className="muted">Rows Loaded</span>
+          <strong>{rows.length.toLocaleString()}</strong>
+        </div>
+        <div className="panel stat-card stat-card--left">
+          <span className="muted">Source</span>
+          <strong>{config.title}</strong>
+        </div>
+      </div>
       <ReportFilters />
       <ReportTable rows={rows} />
     </section>

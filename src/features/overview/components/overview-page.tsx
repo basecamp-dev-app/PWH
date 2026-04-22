@@ -10,9 +10,9 @@ export function OverviewPage() {
     <section className="page-stack">
       <div className="page-heading">
         <p className="eyebrow">Overview</p>
-        <h1>Calendar and desk summary</h1>
+        <h1>Calendar, pace, and desk summary</h1>
         <p className="muted">
-          V1 preserves the overview workflow with a cleaner layout and a smaller component graph.
+          Review the shape of trading activity quickly with a tighter summary layer and more focused operational framing.
         </p>
       </div>
       <div className="stats-row">
