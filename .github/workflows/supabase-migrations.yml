@@ -24,7 +24,7 @@ jobs:
           supabase_token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Link Supabase project
-        run: supabase projects link ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: supabase link --project-id ${{ secrets.SUPABASE_PROJECT_ID }}
 
       - name: Run migrations
         run: supabase db push
