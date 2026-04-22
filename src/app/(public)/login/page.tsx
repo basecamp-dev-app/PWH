@@ -1,4 +1,5 @@
 import { SignInCard } from "@/features/auth/components/sign-in-card";
+import { MagicLinkHandler } from "@/features/auth/components/magic-link-handler";
 
 export default async function LoginPage({
   searchParams,
@@ -7,5 +8,10 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
 
-  return <SignInCard errorMessage={params.error} />;
+  return (
+    <>
+      <MagicLinkHandler />
+      <SignInCard errorMessage={params.error} />
+    </>
+  );
 }
