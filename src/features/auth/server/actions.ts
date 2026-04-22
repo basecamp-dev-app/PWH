@@ -6,15 +6,14 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function signInAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
-  const password = String(formData.get("password") ?? "");
   const supabase = await createSupabaseServerClient();
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithOtp({ email });
   if (error) {
     redirect(`/login?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect("/");
+  redirect("/login?magicLinkSent=true");
 }
 
 export async function signOutAction() {

@@ -4,14 +4,14 @@ import { MagicLinkHandler } from "@/features/auth/components/magic-link-handler"
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; magicLinkSent?: boolean }>;
 }) {
   const params = await searchParams;
 
   return (
     <>
       <MagicLinkHandler />
-      <SignInCard errorMessage={params.error} />
+      <SignInCard errorMessage={params.error} magicLinkSent={params.magicLinkSent} />
     </>
   );
 }
