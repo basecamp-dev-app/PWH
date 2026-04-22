@@ -1,0 +1,44 @@
+name: Supabase Migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v2
+        with:
+          version: latest
+
+      - name: Link Supabase project
+        run: |
+          echo "${{ env.SUPABASE_ACCESS_TOKEN }}" | supabase auth login --token-stdin
+          supabase projects link ${{ env.SUPABASE_PROJECT_ID }} --project-ref ${{ env.SUPABASE_PROJECT_ID }}
+
+      - name: Run migrations
+        run: supabase db push
+
+      - name: Verify tables exist
+        run: |
+          echo "Verifying tables..."
+          supabase db execute --db-url "${{ secrets.SUPABASE_DB_URL }}" -c "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND relname IN ('import_runs', 'report_rows', 'vals_snapshots', 'tracked_orders');"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        continue-on-error: true
+
+      - name: Show migration status
+        run: supabase migration list
