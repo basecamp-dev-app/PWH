@@ -1,8 +1,5 @@
-import { mockIntradayOrders, mockTrackedOrders } from "@/server/shared/mock-data";
+import { getIntradayRuntimeData } from "@/server/data/queries";
 
 export function getIntradayData() {
-  return {
-    significantOrders: mockIntradayOrders,
-    trackedOrders: mockTrackedOrders,
-  };
+  return getIntradayRuntimeData();
 }

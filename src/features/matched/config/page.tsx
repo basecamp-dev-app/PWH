@@ -1,7 +1,7 @@
 import { ReportPage } from "@/features/reports/components/report-page";
 import { getMatchedRows } from "@/features/matched/server/queries";
 
-export function MatchedReportPage() {
+export async function MatchedReportPage() {
   return (
     <ReportPage
       config={{

@@ -2,13 +2,15 @@ import { ReportFilters } from "@/features/reports/components/report-filters";
 import { ReportTable } from "@/features/reports/components/report-table";
 import type { ReportConfig, ReportRow } from "@/features/reports/types";
 
-export function ReportPage({
+export async function ReportPage({
   config,
   rows,
 }: {
   config: ReportConfig;
-  rows: ReportRow[];
+  rows: Promise<ReportRow[]>;
 }) {
+  const resolvedRows = await rows;
+
   return (
     <section className="page-stack">
       <div className="page-heading">
@@ -19,7 +21,7 @@ export function ReportPage({
       <div className="stats-row">
         <div className="panel stat-card stat-card--left">
           <span className="muted">Rows Loaded</span>
-          <strong>{rows.length.toLocaleString()}</strong>
+          <strong>{resolvedRows.length.toLocaleString()}</strong>
         </div>
         <div className="panel stat-card stat-card--left">
           <span className="muted">Source</span>
@@ -27,7 +29,7 @@ export function ReportPage({
         </div>
       </div>
       <ReportFilters />
-      <ReportTable rows={rows} />
+      <ReportTable rows={resolvedRows} />
     </section>
   );
 }

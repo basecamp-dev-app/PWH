@@ -1,7 +1,7 @@
 import { ReportPage } from "@/features/reports/components/report-page";
 import { getOrderbookRows } from "@/features/orderbook/server/queries";
 
-export function OrderbookReportPage() {
+export async function OrderbookReportPage() {
   return (
     <ReportPage
       config={{

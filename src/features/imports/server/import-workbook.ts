@@ -2,8 +2,8 @@ import { workbookSources } from "@/features/imports/lib/workbook-columns";
 
 export function describeImportPlan() {
   return {
-    mode: "manual",
+    mode: "supabase",
     sources: workbookSources,
-    status: "Scaffolded for V1 implementation",
+    status: "Writes canonical workbook data into Supabase import runs",
   };
 }

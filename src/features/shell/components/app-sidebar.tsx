@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { navItems } from "@/features/shell/config/nav-items";
 
-export function AppSidebar() {
+export function AppSidebar({ userEmail }: { userEmail: string }) {
   return (
     <aside className="app-sidebar">
       <div className="app-sidebar__brand">
@@ -21,8 +21,8 @@ export function AppSidebar() {
         ))}
       </nav>
       <div className="app-sidebar__footer">
-        <span>Manual local import</span>
-        <strong>V1</strong>
+        <span>{userEmail}</span>
+        <strong>Secure</strong>
       </div>
     </aside>
   );

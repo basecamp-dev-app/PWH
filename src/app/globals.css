@@ -295,6 +295,12 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
+}
+
+.header-action,
+.button-secondary {
+  box-shadow: none;
 }
 
 .filter-row {
@@ -410,6 +416,11 @@ th {
   font-size: 0.95rem;
 }
 
+.login-error {
+  color: #9d2235;
+  font-size: 0.92rem;
+}
+
 input,
 button {
   font: inherit;
@@ -433,6 +444,49 @@ button,
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: #fff;
   box-shadow: var(--shadow-soft);
+  cursor: pointer;
+}
+
+.button-secondary {
+  background: rgba(22, 58, 89, 0.08);
+  color: var(--accent-strong);
+}
+
+.tracked-order-form,
+.tracked-order-edit {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.tracked-order-form label {
+  flex: 1;
+}
+
+.tracked-order-edit input {
+  flex: 1;
+}
+
+.tracked-order-list,
+.vals-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tracked-order-card,
+.vals-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.vals-card {
+  justify-content: space-between;
 }
 
 .stat-card--left {
@@ -461,5 +515,12 @@ button:disabled {
 
   .weekday-grid {
     grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  }
+
+  .tracked-order-form,
+  .tracked-order-edit,
+  .tracked-order-card {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

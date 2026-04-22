@@ -1,30 +1,26 @@
-import Link from "next/link";
+import { signInAction } from "@/features/auth/server/actions";
 
-export function SignInCard() {
+export function SignInCard({ errorMessage }: { errorMessage?: string }) {
   return (
     <div className="login-page">
       <section className="panel login-card">
         <p className="eyebrow">PWH V1</p>
         <h1>Platform sign in</h1>
         <p className="muted">
-          Internal workspace for traded flow, intraday review, and reporting. Supabase authentication is the next infrastructure pass.
+          Internal workspace for traded flow, intraday review, and reporting. Sign in with your Supabase-backed workspace credentials.
         </p>
-        <form className="login-form">
+        <form className="login-form" action={signInAction}>
           <label>
             Email
-            <input type="email" placeholder="name@company.com" disabled />
+            <input type="email" name="email" placeholder="name@company.com" required />
           </label>
           <label>
             Password
-            <input type="password" placeholder="Auth rollout in progress" disabled />
+            <input type="password" name="password" placeholder="Password" required />
           </label>
-          <button type="button" disabled>
-            Authentication Coming Next
-          </button>
+          {errorMessage ? <p className="login-error">{errorMessage}</p> : null}
+          <button type="submit">Sign in</button>
         </form>
-        <Link href="/" className="text-link">
-          Enter platform preview
-        </Link>
       </section>
     </div>
   );

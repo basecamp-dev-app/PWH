@@ -3,8 +3,8 @@ import { WeekdaySummary } from "@/features/overview/components/weekday-summary";
 import { YearHeatmap } from "@/features/overview/components/year-heatmap";
 import { getOverviewData } from "@/features/overview/server/queries";
 
-export function OverviewPage() {
-  const data = getOverviewData();
+export async function OverviewPage() {
+  const data = await getOverviewData();
 
   return (
     <section className="page-stack">
@@ -26,7 +26,7 @@ export function OverviewPage() {
         </div>
       </div>
       <div className="split-grid">
-        <YearHeatmap />
+        <YearHeatmap months={data.heatmapMonths} />
         <WeekdaySummary rows={data.weekdaySummary} />
       </div>
       <TopTenPanel items={data.topMoves} />

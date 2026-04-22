@@ -1,7 +1,7 @@
 import { ReportPage } from "@/features/reports/components/report-page";
 import { getTradedRows } from "@/features/traded/server/queries";
 
-export function TradedReportPage() {
+export async function TradedReportPage() {
   return (
     <ReportPage
       config={{

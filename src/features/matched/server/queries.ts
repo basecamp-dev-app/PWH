@@ -1,5 +1,5 @@
-import { mockReportRows } from "@/server/shared/mock-data";
+import { getReportRows } from "@/server/data/queries";
 
 export function getMatchedRows() {
-  return mockReportRows.matched;
+  return getReportRows("matched_view");
 }

@@ -1,29 +1,33 @@
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { createClient } from "@supabase/supabase-js";
 import xlsx from "xlsx";
 
 const repoRoot = path.resolve(process.cwd(), "..");
 const dataRoot = path.join(repoRoot, "Data");
-const outputDir = path.join(process.cwd(), "src", "data", "imported");
 
 const databasePath = path.join(dataRoot, "DATABASE.xlsx");
 const valsPath = path.join(dataRoot, "Vals.xlsx");
 const trackedPath = path.join(dataRoot, "tracked");
 const metals = ["LAD", "LCU", "LND", "LZH", "PBD"];
 
-function ensureDir(dirPath) {
-  fs.mkdirSync(dirPath, { recursive: true });
+function requireEnv(name) {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
 }
 
 function normalizeDate(value) {
-  if (!value) return "";
+  if (!value) return null;
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
     return value.toISOString().slice(0, 10);
   }
   if (typeof value === "number") {
     const parsed = xlsx.SSF.parse_date_code(value);
-    if (!parsed) return String(value);
+    if (!parsed) return null;
     return `${parsed.y.toString().padStart(4, "0")}-${String(parsed.m).padStart(2, "0")}-${String(parsed.d).padStart(2, "0")}`;
   }
   const asDate = new Date(value);
@@ -35,7 +39,7 @@ function normalizeDate(value) {
     const [day, month, year] = parts;
     return `${year.padStart(4, "0")}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
   }
-  return String(value);
+  return null;
 }
 
 function normalizeMonthValue(value) {
@@ -70,26 +74,6 @@ function loadClientMap(workbook) {
   );
 }
 
-function toReportRows(rows, source, clientMap) {
-  return rows.map((row) => {
-    const values = Object.values(row);
-    const locationIndex = source === "Traded" ? 9 : 7;
-    return {
-      tradeDate: normalizeDate(values[0]),
-      metal: String(values[1] ?? "").trim(),
-      trader: String(values[2] ?? "").trim(),
-      side: String(values[3] ?? "").trim(),
-      lots: normalizeNumber(values[4]) ?? 0,
-      prompt: normalizeMonthValue(values[5]),
-      carry: normalizeMonthValue(values[6]),
-      desk: source === "Traded" ? "TR" : source === "Orderbook" ? "OB" : "MP",
-      company: clientMap.get(String(values[2] ?? "").trim()) ?? "Unknown",
-      location: values[locationIndex] === "" ? "" : String(values[locationIndex]).trim(),
-      source,
-    };
-  });
-}
-
 function formatLocation(value) {
   const numeric = normalizeNumber(value);
   if (numeric == null) return String(value ?? "").trim();
@@ -99,94 +83,140 @@ function formatLocation(value) {
   return Number.isInteger(absolute) ? `${absolute}b` : `${absolute.toFixed(2)}b`;
 }
 
+function normalizeTrackedKey(value) {
+  return value.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function toReportRows(rows, reportType, clientMap) {
+  return rows.map((row, index) => {
+    const values = Object.values(row);
+    const isTraded = reportType === "traded";
+    const locationIndex = isTraded ? 9 : 7;
+    const workflowBucket = isTraded ? String(values[7] ?? "").trim() : "";
+    const mocFlag = isTraded && String(values[8] ?? "").trim() === "MOC";
+
+    return {
+      report_type: reportType,
+      source_sheet: reportType === "traded" ? "Database" : reportType === "orderbook" ? "Orderbook" : "Matched",
+      source_row: index + 2,
+      trade_date: normalizeDate(values[0]),
+      metal: String(values[1] ?? "").trim(),
+      trader: String(values[2] ?? "").trim(),
+      side: String(values[3] ?? "").trim(),
+      lots: normalizeNumber(values[4]) ?? 0,
+      prompt: normalizeMonthValue(values[5]),
+      carry: normalizeMonthValue(values[6]),
+      desk: reportType === "traded" ? "TR" : reportType === "orderbook" ? "OB" : "MP",
+      company: clientMap.get(String(values[2] ?? "").trim()) ?? "Unknown",
+      location: formatLocation(values[locationIndex]),
+      workflow_bucket: workflowBucket,
+      moc_flag: mocFlag,
+    };
+  });
+}
+
 function parseValsWorkbook() {
   if (!fs.existsSync(valsPath)) return [];
   const workbook = xlsx.readFile(valsPath, { cellDates: true });
   const rows = parseWorkbookSheet(workbook, "Vals");
-  return rows.map((row) => {
+  return rows.flatMap((row) => {
     const values = Object.values(row);
-    const record = { combo: String(values[0] ?? "").trim() };
-    metals.forEach((metal, index) => {
-      record[metal] = values[index + 1] ?? "";
-    });
-    return record;
+    const comboKey = String(values[0] ?? "").trim();
+
+    if (!comboKey) return [];
+
+    return metals.map((metal, index) => ({
+      combo_key: comboKey,
+      metal,
+      value: String(values[index + 1] ?? "").trim(),
+    }));
   });
 }
 
 function parseTrackedFile() {
   if (!fs.existsSync(trackedPath)) return [];
-  return fs.readFileSync(trackedPath, "utf8").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  return fs
+    .readFileSync(trackedPath, "utf8")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => ({ line, normalized_key: normalizeTrackedKey(line) }));
 }
 
-function buildIntraday(tradedRows, orderbookRows, matchedRows, valsRows, trackedLines) {
-  const latestDate = [...tradedRows, ...orderbookRows, ...matchedRows].map((row) => row.tradeDate).filter(Boolean).sort().at(-1);
-  const valsLookup = new Map(valsRows.filter((row) => row.combo).map((row) => [String(row.combo), row]));
+async function chunkedInsert(supabase, table, rows, extra = {}) {
+  const chunkSize = 500;
 
-  return {
-    significantOrders: [...tradedRows, ...orderbookRows, ...matchedRows]
-      .filter((row) => row.tradeDate === latestDate && row.lots > 25)
-      .map((row) => {
-        const combo = `${row.prompt} / ${row.carry}`;
-        const vals = valsLookup.get(combo);
-        const lookup = vals && row.metal in vals ? String(vals[row.metal]) : "";
-        const line = `${row.trader} ${row.side}s ${row.lots} Lots of ${row.metal}, ${combo} at ${formatLocation(row.location)} (${row.desk})`;
-        return {
-          line,
-          lookup,
-          state: trackedLines.some((entry) => entry.includes(line.split(" at ")[0])) ? "watch" : "normal",
-        };
-      }),
-    trackedOrders: trackedLines,
-  };
-}
-
-function buildOverview(tradedRows) {
-  const rows = tradedRows.filter((row) => row.tradeDate);
-  const totalLots = rows.reduce((sum, row) => sum + row.lots, 0);
-  const latestMonthPrefix = rows.map((row) => row.tradeDate.slice(0, 7)).sort().at(-1) ?? "";
-  const monthlyRows = rows.filter((row) => row.tradeDate.startsWith(latestMonthPrefix));
-  const monthLots = monthlyRows.reduce((sum, row) => sum + row.lots, 0);
-  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const weekdayTotals = new Map();
-
-  for (const row of monthlyRows) {
-    const weekday = weekdays[new Date(`${row.tradeDate}T00:00:00`).getDay()];
-    weekdayTotals.set(weekday, (weekdayTotals.get(weekday) ?? 0) + row.lots);
+  for (let index = 0; index < rows.length; index += chunkSize) {
+    const chunk = rows.slice(index, index + chunkSize).map((row) => ({ ...row, ...extra }));
+    const { error } = await supabase.from(table).insert(chunk);
+    if (error) {
+      throw new Error(`${table} insert failed: ${error.message}`);
+    }
   }
-
-  return {
-    yearlyTotal: `${totalLots.toLocaleString()} lots`,
-    monthTotal: `${monthLots.toLocaleString()} lots`,
-    weekdaySummary: ["Mon", "Tue", "Wed", "Thu", "Fri"].map((day) => ({
-      day,
-      value: `${(weekdayTotals.get(day) ?? 0).toLocaleString()} lots`,
-    })),
-    topMoves: rows.slice().sort((a, b) => b.lots - a.lots).slice(0, 3).map((row) => `${row.tradeDate}: ${row.trader} ${row.side} ${row.lots} ${row.metal}`),
-  };
 }
 
-function main() {
-  ensureDir(outputDir);
+async function main() {
   if (!fs.existsSync(databasePath)) {
     throw new Error(`Missing workbook: ${databasePath}`);
   }
 
+  const supabase = createClient(requireEnv("NEXT_PUBLIC_SUPABASE_URL"), requireEnv("SUPABASE_SERVICE_ROLE_KEY"), {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
   const workbook = xlsx.readFile(databasePath, { cellDates: true });
   const clientMap = loadClientMap(workbook);
-  const tradedRows = toReportRows(parseWorkbookSheet(workbook, "Database"), "Traded", clientMap);
-  const orderbookRows = toReportRows(parseWorkbookSheet(workbook, "Orderbook"), "Orderbook", clientMap);
-  const matchedRows = toReportRows(parseWorkbookSheet(workbook, "Matched"), "Matched", clientMap);
+  const tradedRows = toReportRows(parseWorkbookSheet(workbook, "Database"), "traded", clientMap);
+  const orderbookRows = toReportRows(parseWorkbookSheet(workbook, "Orderbook"), "orderbook", clientMap);
+  const matchedRows = toReportRows(parseWorkbookSheet(workbook, "Matched"), "matched", clientMap);
   const valsRows = parseValsWorkbook();
   const trackedRows = parseTrackedFile();
 
-  fs.writeFileSync(path.join(outputDir, "traded.json"), JSON.stringify(tradedRows, null, 2));
-  fs.writeFileSync(path.join(outputDir, "orderbook.json"), JSON.stringify(orderbookRows, null, 2));
-  fs.writeFileSync(path.join(outputDir, "matched.json"), JSON.stringify(matchedRows, null, 2));
-  fs.writeFileSync(path.join(outputDir, "intraday.json"), JSON.stringify(buildIntraday(tradedRows, orderbookRows, matchedRows, valsRows, trackedRows), null, 2));
-  fs.writeFileSync(path.join(outputDir, "overview.json"), JSON.stringify(buildOverview(tradedRows), null, 2));
-  fs.writeFileSync(path.join(outputDir, "vals.json"), JSON.stringify(valsRows, null, 2));
+  const { data: importRun, error: importRunError } = await supabase
+    .from("import_runs")
+    .insert({
+      source: "local_workbooks",
+      status: "pending",
+      notes: `DATABASE.xlsx, Vals.xlsx, tracked imported from ${dataRoot}`,
+      is_active: false,
+    })
+    .select("id")
+    .single();
 
-  process.stdout.write("Imported local workbook data into src/data/imported\n");
+  if (importRunError || !importRun) {
+    throw new Error(importRunError?.message ?? "Failed to create import run.");
+  }
+
+  const importRunId = importRun.id;
+
+  try {
+    await chunkedInsert(supabase, "report_rows", [...tradedRows, ...orderbookRows, ...matchedRows], { import_run_id: importRunId });
+    await chunkedInsert(supabase, "vals_snapshots", valsRows, { import_run_id: importRunId });
+    await chunkedInsert(supabase, "tracked_orders", trackedRows, { import_run_id: importRunId });
+
+    const { error: deactivateRunsError } = await supabase
+      .from("import_runs")
+      .update({ is_active: false })
+      .neq("id", importRunId);
+
+    if (deactivateRunsError) {
+      throw new Error(deactivateRunsError.message);
+    }
+
+    const { error: activateRunError } = await supabase
+      .from("import_runs")
+      .update({ is_active: true, status: "completed" })
+      .eq("id", importRunId);
+
+    if (activateRunError) {
+      throw new Error(activateRunError.message);
+    }
+  } catch (error) {
+    await supabase.from("import_runs").update({ status: "failed" }).eq("id", importRunId);
+    throw error;
+  }
+
+  process.stdout.write("Imported local workbook data into Supabase\n");
 }
 
 main();

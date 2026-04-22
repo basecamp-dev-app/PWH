@@ -1,5 +1,5 @@
-import { mockOverview } from "@/server/shared/mock-data";
+import { getOverviewRuntimeData } from "@/server/data/queries";
 
 export function getOverviewData() {
-  return mockOverview;
+  return getOverviewRuntimeData();
 }
