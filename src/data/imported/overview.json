@@ -1,0 +1,31 @@
+{
+  "yearlyTotal": "1,702,498 lots",
+  "monthTotal": "70,946 lots",
+  "weekdaySummary": [
+    {
+      "day": "Mon",
+      "value": "20,691 lots"
+    },
+    {
+      "day": "Tue",
+      "value": "12,932 lots"
+    },
+    {
+      "day": "Wed",
+      "value": "13,433 lots"
+    },
+    {
+      "day": "Thu",
+      "value": "14,126 lots"
+    },
+    {
+      "day": "Fri",
+      "value": "9,764 lots"
+    }
+  ],
+  "topMoves": [
+    "2023-12-18: Barrett Sell 3095 LAD",
+    "2024-01-10: Barrett Borrow 3000 LAD",
+    "2024-01-11: Barrett Borrow 3000 LAD"
+  ]
+}

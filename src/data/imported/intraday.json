@@ -1,0 +1,150 @@
+{
+  "significantOrders": [
+    {
+      "line": "Sav Borrows 80 Lots of LCU, May-2025 / Jun-2025 at 2c (TR)",
+      "lookup": "-2.25",
+      "state": "normal"
+    },
+    {
+      "line": "Barrett Buys 61 Lots of LAD, Cash /  at LVL (TR)",
+      "lookup": "",
+      "state": "normal"
+    },
+    {
+      "line": "Jonathan Singh Sells 26 Lots of LZH, Mar-2025 /  at 9.75c (TR)",
+      "lookup": "",
+      "state": "normal"
+    },
+    {
+      "line": "Jonathan Singh Buys 26 Lots of LZH, Mar-2025 /  at 9.75c (TR)",
+      "lookup": "",
+      "state": "normal"
+    },
+    {
+      "line": "Barrett Borrows 100 Lots of LAD, Mar-2025 / 3s at 8b (TR)",
+      "lookup": "-18.86",
+      "state": "watch"
+    },
+    {
+      "line": "Sav Borrows 250 Lots of LND, Oct-2026 / Oct-2027 at 752c (TR)",
+      "lookup": "26",
+      "state": "normal"
+    },
+    {
+      "line": "Michael Orr2 Lends 250 Lots of LND, Oct-2026 / Oct-2027 at 752c (TR)",
+      "lookup": "26",
+      "state": "normal"
+    },
+    {
+      "line": "Michael Orr Lends 50 Lots of LND, Sept-2025 / Oct-2025 at LVL (TR)",
+      "lookup": "",
+      "state": "normal"
+    },
+    {
+      "line": "Michael Orr Borrows 100 Lots of LAD, Apr-2025 / May-2025 at LVL (TR)",
+      "lookup": "-4.08",
+      "state": "normal"
+    },
+    {
+      "line": "Michael Orr Borrows 100 Lots of LAD, Jun-2025 / Jul-2025 at LVL (TR)",
+      "lookup": "-2.26",
+      "state": "normal"
+    },
+    {
+      "line": "Michael Orr Borrows 40 Lots of LCU, Dec-2025 / Dec-2026 at LVL (TR)",
+      "lookup": "29",
+      "state": "normal"
+    },
+    {
+      "line": "Ollie Lends 100 Lots of LAD, Jun-2025 / Jul-2025 at LVL (TR)",
+      "lookup": "-2.26",
+      "state": "normal"
+    },
+    {
+      "line": "Ollie Lends 100 Lots of LAD, 3s / Nov-2025 at 3.27c (TR)",
+      "lookup": "8.29",
+      "state": "normal"
+    },
+    {
+      "line": "Ollie Lends 100 Lots of LAD, 3s / Jun-2025 at LVL (TR)",
+      "lookup": "1.7899999999999998",
+      "state": "normal"
+    },
+    {
+      "line": "Ollie Lends 100 Lots of LAD, Jul-2025 / Sept-2025 at LVL (TR)",
+      "lookup": "",
+      "state": "normal"
+    },
+    {
+      "line": "Ollie Lends 200 Lots of LAD, Mar-2025 / 3s at LVL (TR)",
+      "lookup": "-18.86",
+      "state": "normal"
+    },
+    {
+      "line": "Morph Sells 121 Lots of LCU, Jun-2025 /  at LVL (TR)",
+      "lookup": "",
+      "state": "normal"
+    },
+    {
+      "line": "Morph Borrows 50 Lots of LCU, Mar-2025 / Jun-2025 at LVL (TR)",
+      "lookup": "8.399999999999999",
+      "state": "normal"
+    },
+    {
+      "line": "Noah Borrows 400 Lots of PBD, Sept-2025 / Dec-2025 at 25.50c (OB)",
+      "lookup": "",
+      "state": "normal"
+    },
+    {
+      "line": "Noah Borrows 400 Lots of PBD, Mar-2025 / Apr-2025 at 14c (OB)",
+      "lookup": "65.09",
+      "state": "normal"
+    },
+    {
+      "line": "Alex Clarke Lends 200 Lots of LCU, Cash / Mar-2025 at 31c (OB)",
+      "lookup": "8.95",
+      "state": "normal"
+    },
+    {
+      "line": "Noah Borrows 200 Lots of PBD, Sept-2025 / Oct-2025 at 6.30c (MP)",
+      "lookup": "",
+      "state": "normal"
+    },
+    {
+      "line": "Michael Orr Lends 442 Lots of LND, Apr-2025 / May-2025 at 83.50c (MP)",
+      "lookup": "6.96",
+      "state": "normal"
+    },
+    {
+      "line": "Calv Lends 400 Lots of LCU, 3s / Dec-2025 at 19c (MP)",
+      "lookup": "-32.85",
+      "state": "normal"
+    },
+    {
+      "line": "Francis Borrows 200 Lots of LAD, Dec-2025 / Dec-2026 at 10.20b (MP)",
+      "lookup": "5",
+      "state": "watch"
+    },
+    {
+      "line": "Michael Orr Lends 100 Lots of PBD, Sept-2025 / Oct-2025 at 6.45c (MP)",
+      "lookup": "",
+      "state": "normal"
+    },
+    {
+      "line": "Bernie Lends 250 Lots of LZH, May-2025 / Jun-2025 at 6.25c (MP)",
+      "lookup": "6.47",
+      "state": "normal"
+    }
+  ],
+  "trackedOrders": [
+    "21/02/2025 Barrett Borrows 100 Lots of LAD, Mar-2025 / 3s at 8b (TR)",
+    "21/02/2025 Francis Borrows 200 Lots of LAD, Dec-2025 / Dec-2026 at 10.2b (MP)",
+    "19/02/2025 Adam Peters Borrows 500 Lots of LAD, Mar-2025 / Apr-2025 at 5b (OB)",
+    "17/02/2025 Barrett Borrows 200 Lots of LAD, Cash / Mar-2025 at 19b (TR)",
+    "19/02/2025 Barrett Borrows 100 Lots of LAD, May-2025 / Jun-2025 at 0.5c (TR)",
+    "20/02/2025 Tex Lends 75 Lots of LCU, Dec-2025 / Jun-2026 at 24.7c (TR)",
+    "20/02/2025 Sav Borrows 85 Lots of LCU, Apr-2025 / May-2025 at 2c (TR)",
+    "20/02/2025 Morph Lends 100 Lots of LCU, Cash / Mar-2025 at 30c (OB)",
+    "20/02/2025 Michael North Lends 40 Lots of LCU, 3s / Dec-2025 at 18c (TR)"
+  ]
+}
