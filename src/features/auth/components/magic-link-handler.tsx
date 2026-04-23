@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createSupabasePublicClient, getSessionFromUrl } from "@/lib/supabase/browser";
+import { getSessionFromUrl } from "@/lib/supabase/browser";
+import { setSessionAction } from "@/features/auth/server/actions";
 
 export function MagicLinkHandler() {
   const router = useRouter();
@@ -17,14 +18,9 @@ export function MagicLinkHandler() {
           return;
         }
 
-        const supabase = createSupabasePublicClient();
-        const { error } = await supabase.auth.setSession({
-          access_token: tokens.accessToken,
-          refresh_token: tokens.refreshToken,
-        });
-
-        if (error) {
-          console.error("Magic link session error:", error);
+        const result = await setSessionAction(tokens.accessToken, tokens.refreshToken);
+        if (result.error) {
+          console.error("Magic link session error:", result.error);
           setStatus("error");
           return;
         }
